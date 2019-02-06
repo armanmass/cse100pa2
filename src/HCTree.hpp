@@ -45,7 +45,13 @@ public:
 
     /** Destructor for HCTree
      */
-    ~HCTree();
+    ~HCTree() {
+        for(int i = 0; i < leaves.size(); i++)
+            if(leaves[i]) {
+                delete leaves[i];
+                leaves[i] = (HCNode*)0;
+            }
+    }
 
     /** Use the Huffman algorithm to build a Huffman coding tree.
      *  PRECONDITION: freqs is a vector of ints, such that freqs[i] is
@@ -53,7 +59,31 @@ public:
      *  POSTCONDITION:  root points to the root of the tree,
      *  and leaves[i] points to the leaf node containing byte i.
      */
-    void build(const vector<int>& freqs);
+    void build(const vector<int>& freqs) {
+        for(int i = 0; i < freqs.size(); i++){
+            if(freqs[i] > 0) {
+                HCNode *n1 = new HCNode(freqs[i], (byte)i, 0, 0, 0);
+                leaves[i] = n1;
+                pq.push(n1);
+            }
+        }
+
+        while(pq.size() > 1) {
+
+            HCNode* p1 = pq.pop();
+            HCNode* p2 = pq.pop();
+
+
+            HCNode* merge = new HCNode(p1->count + p2->count, 
+                                       p1->symbol, p1, p2, 0);
+                                       
+            p1->parent = merge;
+            p2->parent = merge;
+
+            pq.push(merge);
+        }
+
+    };
 
     /** Write to the given BitOutputStream
      *  the sequence of bits coding the given symbol.
