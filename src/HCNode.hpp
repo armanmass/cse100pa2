@@ -28,17 +28,7 @@ public:
      *  We want small counts to have high priority.
      *  And we want to break ties deterministically.
      */
-    bool operator<(const HCNode& other) const {
-        if(other.count < this.count)
-            return true;
-
-        if(other.count == this.count) {
-            if(this.symbol < other.symbol)
-                return true;
-        }
-        
-        return false;
-    }
+    bool operator<(const HCNode& other);
 };
 
 /** For printing an HCNode to an ostream

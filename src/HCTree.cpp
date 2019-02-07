@@ -7,7 +7,12 @@
  * Destructor for HCTree
  */
 HCTree::~HCTree() {
-    // TODO (checkpoint)
+    for(size_t i = 0; i < leaves.size(); i++) {
+        if(leaves[i]) {
+            delete leaves[i];
+            leaves[i] = (HCNode*)0;
+        }
+    }
 }
 
 /** Use the Huffman algorithm to build a Huffman coding tree.
@@ -17,7 +22,34 @@ HCTree::~HCTree() {
  *  and leaves[i] points to the leaf node containing byte i.
  */
 void HCTree::build(const vector<int>& freqs) {
-    // TODO (checkpoint)
+
+    std::priority_queue<HCNode*> pq;
+
+    for(size_t i = 0; i < freqs.size(); i++){
+            if(freqs[i] > 0) {
+                HCNode *n1 = new HCNode(freqs[i], (byte)i, 0, 0, 0);
+                leaves[i] = n1;
+                pq.push(n1);
+            }
+        }
+
+        HCNode* p1;
+        HCNode* p2;
+
+        while(pq.size() > 1) {
+
+            p1 = pq.pop();
+            p2 = pq.pop();
+
+
+            HCNode* merge = new HCNode(p1->count + p2->count, 
+                                       p1->symbol, p1, p2, 0);
+                                       
+            p1->p = merge;
+            p2->p = merge;
+
+            pq.push(merge);
+        }
 }
 
 /** Write to the given ostream
@@ -26,7 +58,15 @@ void HCTree::build(const vector<int>& freqs) {
  *  tree, and initialize root pointer and leaves vector.
  */
 void HCTree::encode(byte symbol, ostream& out) const {
-    // TODO (checkpoint)
+    HCNode* climb = leaves[(int)symbol];
+        while(climb){
+            if(climb->p->c0 == climb){
+                out << 0;
+            }else{
+                out << 1;
+            }
+            climb = climb->p;
+        }
 }
 
 /** Return the symbol coded in the next sequence of bits (represented as 
@@ -35,7 +75,26 @@ void HCTree::encode(byte symbol, ostream& out) const {
  *  tree, and initialize root pointer and leaves vector.
  */
 byte HCTree::decode(istream& in) const {
-    return 0;  // TODO (checkpoint)
+    HCNode* temp = root;
+        int bit;
+
+        while(1){
+            in >> bit;
+
+            if(in.eof())
+                break;
+
+            if(in){
+                temp = temp->c1;
+            }else{
+                temp = temp->c0;
+            }
+
+            if(!temp->c1)
+                return temp->symbol;
+        }
+
+        return 0;
 }
 
 /** Write to the given BitOutputStream

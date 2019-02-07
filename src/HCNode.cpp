@@ -5,5 +5,13 @@
  *  And we want to break ties deterministically.
  */
 bool HCNode::operator<(const HCNode& other) {
-    return false;  // TODO (checkpoint)
+    if(other.count < this->count)
+            return true;
+
+    if(other.count == this->count) {
+        if(this->symbol < other.symbol)
+            return true;
+    }    
+    
+    return false;
 }
