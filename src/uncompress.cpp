@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <stdint.h>
+#include <sstream>
 
 #include "HCNode.hpp"
 #include "HCTree.hpp"
@@ -23,9 +24,33 @@ void print_usage(char ** argv) {
  * For debugging purposes, uses ASCII '0' and '1' rather than bitwise I/O.
  */
 void uncompressAscii(const string & infile, const string & outfile) {
-    // TODO (checkpoint)
-    cerr << "TODO: uncompress '" << infile << "' -> '"
-        << outfile << "' here (ASCII)" << endl;
+    ifstream ifs;
+    ofstream ofs;
+    ifs.open(infile, ios::binary);
+    ofs.open(outfile, ios::binary);
+
+    HCTree tree;
+    vector<int> freqs(256, 0);
+    int count;
+  
+    for(size_t i = 0; i < freqs.size(); i++){
+        ifs >> count;
+        freqs[i] = count;
+    }
+        
+    tree.build(freqs);
+
+    std::string bitString;
+    ifs >> bitString;
+    std::istringstream iss(bitString);
+
+    while(!iss.eof())
+        ofs << (char)tree.decode(iss);
+
+
+
+    ifs.close();
+    ofs.close();
 }
 
 /**

@@ -1,6 +1,6 @@
 #include <stack>
 #include <queue>
-
+#include <algorithm>
 #include "HCTree.hpp"
 
 /**
@@ -8,10 +8,8 @@
  */
 HCTree::~HCTree() {
     for(size_t i = 0; i < leaves.size(); i++) {
-        if(leaves[i]) {
+        if(leaves[i]) 
             delete leaves[i];
-            leaves[i] = (HCNode*)0;
-        }
     }
 }
 
@@ -23,7 +21,7 @@ HCTree::~HCTree() {
  */
 void HCTree::build(const vector<int>& freqs) {
 
-    std::priority_queue<HCNode*> pq;
+    std::priority_queue<HCNode*, std::vector<HCNode*>, HCNodePtrComp> pq;
 
     for(size_t i = 0; i < freqs.size(); i++){
             if(freqs[i] > 0) {
@@ -33,23 +31,22 @@ void HCTree::build(const vector<int>& freqs) {
             }
         }
 
-        HCNode* p1;
-        HCNode* p2;
+    while(pq.size() > 1) {
 
-        while(pq.size() > 1) {
+        HCNode* p1 = pq.top();
+        pq.pop();
+        HCNode* p2 = pq.top();
+        pq.pop();
 
-            p1 = pq.pop();
-            p2 = pq.pop();
+        HCNode* merge = new HCNode(p1->count + p2->count, 
+                                   p2->symbol, p1, p2, 0);          
+        p1->p = merge;
+        p2->p = merge;
 
+        pq.push(merge);
+    }
 
-            HCNode* merge = new HCNode(p1->count + p2->count, 
-                                       p1->symbol, p1, p2, 0);
-                                       
-            p1->p = merge;
-            p2->p = merge;
-
-            pq.push(merge);
-        }
+    root = pq.top();
 }
 
 /** Write to the given ostream
@@ -59,14 +56,19 @@ void HCTree::build(const vector<int>& freqs) {
  */
 void HCTree::encode(byte symbol, ostream& out) const {
     HCNode* climb = leaves[(int)symbol];
-        while(climb){
+    std::string buf = "";
+
+        while(climb->p){
             if(climb->p->c0 == climb){
-                out << 0;
+                buf.append("0");
             }else{
-                out << 1;
+                buf.append("1");
             }
             climb = climb->p;
         }
+    
+    std::reverse(buf.begin(), buf.end());
+    out << buf;
 }
 
 /** Return the symbol coded in the next sequence of bits (represented as 
@@ -76,25 +78,21 @@ void HCTree::encode(byte symbol, ostream& out) const {
  */
 byte HCTree::decode(istream& in) const {
     HCNode* temp = root;
-        int bit;
+    char bit;
 
-        while(1){
-            in >> bit;
+    while(in.get(bit)){
 
-            if(in.eof())
-                break;
-
-            if(in){
-                temp = temp->c1;
-            }else{
-                temp = temp->c0;
-            }
-
-            if(!temp->c1)
-                return temp->symbol;
+        if(bit == '1'){
+            temp = temp->c1;
+        }else{
+            temp = temp->c0;
         }
 
-        return 0;
+        if(!temp->c1)
+            return temp->symbol;
+    }
+
+    return 0;
 }
 
 /** Write to the given BitOutputStream

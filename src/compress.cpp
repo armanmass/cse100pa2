@@ -22,9 +22,36 @@ void print_usage(char ** argv) {
  * For debugging purposes, uses ASCII '0' and '1' rather than bitwise I/O.
  */
 void compressAscii(const string & infile, const string & outfile) {
-    // TODO (checkpoint)
+    ifstream ifs;
+    ofstream ofs;
+    ifs.open(infile, ios::binary);
+    ofs.open(outfile, ios::binary);
+
+    HCTree tree;
+    vector<int> freqs(256, 0);
+    char c;
+
+    while(ifs.get(c))
+        freqs[(int)c]++;
+
+    tree.build(freqs);
+
+    for(size_t i = 0; i < freqs.size(); i++)
+        ofs << freqs[i] << endl;
+
+    ifs.clear();
+    ifs.seekg(0, ios::beg);
+
+    while(ifs.get(c)){
+        tree.encode(c, ofs);
+    }
+
+
     cerr << "TODO: compress '" << infile << "' -> '"
         << outfile << "' here (ASCII)" << endl;
+    
+    ifs.close();
+    ofs.close();
 }
 
 /**

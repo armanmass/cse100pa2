@@ -9,7 +9,7 @@ bool HCNode::operator<(const HCNode& other) {
             return true;
 
     if(other.count == this->count) {
-        if(this->symbol < other.symbol)
+        if(this->symbol > other.symbol)
             return true;
     }    
     
