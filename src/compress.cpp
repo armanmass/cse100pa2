@@ -26,13 +26,24 @@ void compressAscii(const string & infile, const string & outfile) {
     ofstream ofs;
     ifs.open(infile, ios::binary);
     ofs.open(outfile, ios::binary);
-
+    ifs >> std::noskipws;
+    
     HCTree tree;
     vector<int> freqs(256, 0);
-    char c;
+    byte c;
 
-    while(ifs.get(c))
+    if(ifs.peek() == -1){
+        for(size_t i = 0; i < freqs.size(); i++)
+            ofs << 0 << endl;
+        ifs.close();
+        ofs.close();
+        return;
+    }
+
+    while(ifs.peek() != -1){
+        ifs >> c;
         freqs[(int)c]++;
+    }
 
     tree.build(freqs);
 
@@ -42,10 +53,10 @@ void compressAscii(const string & infile, const string & outfile) {
     ifs.clear();
     ifs.seekg(0, ios::beg);
 
-    while(ifs.get(c)){
+    while(ifs.peek() != -1){
+        ifs >> c;
         tree.encode(c, ofs);
     }
-
 
     cerr << "TODO: compress '" << infile << "' -> '"
         << outfile << "' here (ASCII)" << endl;

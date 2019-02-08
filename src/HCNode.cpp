@@ -1,5 +1,10 @@
 #include "HCNode.hpp"
 
+HCNode::~HCNode() {
+    delete c0;
+    delete c1;
+}
+
 /** Less-than comparison, so HCNodes will work in std::priority_queue
  *  We want small counts to have high priority.
  *  And we want to break ties deterministically.

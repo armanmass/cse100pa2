@@ -7,10 +7,7 @@
  * Destructor for HCTree
  */
 HCTree::~HCTree() {
-    for(size_t i = 0; i < leaves.size(); i++) {
-        if(leaves[i]) 
-            delete leaves[i];
-    }
+    delete root;
 }
 
 /** Use the Huffman algorithm to build a Huffman coding tree.
@@ -20,7 +17,7 @@ HCTree::~HCTree() {
  *  and leaves[i] points to the leaf node containing byte i.
  */
 void HCTree::build(const vector<int>& freqs) {
-
+    delete root;
     std::priority_queue<HCNode*, std::vector<HCNode*>, HCNodePtrComp> pq;
 
     for(size_t i = 0; i < freqs.size(); i++){
