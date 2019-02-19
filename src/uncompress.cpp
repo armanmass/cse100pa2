@@ -113,8 +113,7 @@ void uncompressBitwise(const string & infile, const string & outfile) {
     int total = 0;
     int num = -1;
 
-    while(first == total){
-        if(ifs.peek() == -1) break;
+    for(int i = 0; i < 256; i++){
         if(!first){
             ifs >> first;
             total += first;
@@ -142,16 +141,17 @@ void uncompressBitwise(const string & infile, const string & outfile) {
     }
         
     tree.build(freqs);
-
-    std::string bitString;
-    ifs >> bitString;
-    std::istringstream iss(bitString);
-
-    while(1){
-        if(iss.peek() == -1) break;
-        ofs << (unsigned char)tree.decode(iss);
+    ifs.get();
+    BitInputStream bis(ifs);
+    int i = 0;
+    while(i < total){
+        if(ifs.eof()) break;
+        ofs << (byte)tree.decode(bis);
+        i++;
     }
-
+    
+    cout << i << endl;
+    cout << total << endl;
     ifs.close();
     ofs.close();
     cerr << "TODO: uncompress '" << infile << "' -> '"

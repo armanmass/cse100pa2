@@ -46,7 +46,7 @@ void compressAscii(const string & infile, const string & outfile) {
     }
 
     tree.build(freqs);
-    tree.printTree();
+    //tree.printTree();
     for(size_t i = 0; i < freqs.size(); i++)
         ofs << freqs[i] << endl;
 
@@ -76,6 +76,7 @@ void compressBitwise(const string & infile, const string & outfile) {
     ifs.open(infile, ios::binary);
     ofs.open(outfile, ios::binary);
     ifs >> std::noskipws;
+    BitOutputStream bos(ofs);
     
     HCTree tree;
     vector<int> freqs(256, 0);
@@ -95,7 +96,7 @@ void compressBitwise(const string & infile, const string & outfile) {
     }
 
     tree.build(freqs);
-    tree.printTree();
+    //tree.printTree();
     for(size_t i = 0; i < freqs.size(); i++)
         ofs << freqs[i] << endl;
 
@@ -104,8 +105,9 @@ void compressBitwise(const string & infile, const string & outfile) {
 
     while(ifs.peek() != -1){
         ifs >> c;
-        tree.encode(c, ofs);
+        tree.encode(c, bos);
     }
+    bos.flush();
 
     cerr << "TODO: compress '" << infile << "' -> '"
         << outfile << "' here (bitwise)" << endl;
