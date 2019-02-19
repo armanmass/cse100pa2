@@ -8,6 +8,8 @@ using namespace std;
 class BitOutputStream {
 private:
     ostream & out;
+    int nbit;
+    unsigned char write;
 
 public:
     BitOutputStream(ostream & o);

@@ -79,11 +79,10 @@ byte HCTree::decode(istream& in) const {
 
     while(in.get(bit)){
 
-        if(bit == '1'){
+        if(bit == '1')
             temp = temp->c1;
-        }else{
+        else
             temp = temp->c0;
-        }
 
         if(!temp->c1)
             return temp->symbol;
@@ -98,7 +97,27 @@ byte HCTree::decode(istream& in) const {
  *  tree, and initialize root pointer and leaves vector.
  */
 void HCTree::encode(byte symbol, BitOutputStream& out) const {
-    // TODO (final)
+    HCNode* climb = leaves[(int)symbol];
+    std::string buf = "";
+
+        while(climb->p){
+            if(climb->p->c0 == climb)
+                buf.append("0");
+            else
+                buf.append("1");
+            
+            climb = climb->p;
+        }
+    
+    std::reverse(buf.begin(), buf.end());
+
+    for(size_t i = 0; i < buf.length(); i++){
+        if(buf[i] == '1')
+            out.writeBit(true);
+        else
+            out.writeBit(false);
+    }
+
 }
 
 /** Return symbol coded in the next sequence of bits from the stream.
@@ -106,7 +125,16 @@ void HCTree::encode(byte symbol, BitOutputStream& out) const {
  *  tree, and initialize root pointer and leaves vector.
  */
 byte HCTree::decode(BitInputStream& in) const {
-    return 0;  // TODO (final)
+    HCNode* curr = root;
+
+    while(curr->c0){
+        if(in.readBit())
+            curr = curr->c1;
+        else
+            curr = curr->c0;
+    }
+    
+    return curr->symbol;  // TODO (final)
 }
 
 /**

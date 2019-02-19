@@ -93,7 +93,67 @@ void uncompressAscii(const string & infile, const string & outfile) {
  * Uses bitwise I/O.
  */
 void uncompressBitwise(const string & infile, const string & outfile) {
-    // TODO (final)
+    ifstream ifs;
+    ofstream ofs;
+    ifs.open(infile, ios::binary);
+    ofs.open(outfile, ios::binary);
+
+    HCTree tree;
+    vector<int> freqs(256, 0);
+    int count;
+  
+    if(ifs.peek() == -1){
+        ifs.close();
+        ofs.close();
+        return;
+    }
+
+    int first = 0;
+    int next = 0;
+    int total = 0;
+    int num = -1;
+
+    while(first == total){
+        if(ifs.peek() == -1) break;
+        if(!first){
+            ifs >> first;
+            total += first;
+            num++;
+        }else{
+            ifs >> next;
+        }       
+        total += next;
+    }
+
+    if(first == total){
+        for(int i = 0; i < first; i++)
+            ofs << (unsigned char)num;
+        ifs.close();
+        ofs.close();
+        return;
+    }
+
+    ifs.clear();
+    ifs.seekg(0, ios::beg);
+
+    for(size_t i = 0; i < freqs.size(); i++){
+        ifs >> count;
+        freqs[i] = count;
+    }
+        
+    tree.build(freqs);
+
+    std::string bitString;
+    ifs >> bitString;
+    std::istringstream iss(bitString);
+
+    while(1){
+        if(iss.peek() == -1) break;
+        ofs << (unsigned char)tree.decode(iss);
+    }
+
+    ifs.close();
+    ofs.close();
     cerr << "TODO: uncompress '" << infile << "' -> '"
         << outfile << "' here (bitwise)" << endl;
 }
