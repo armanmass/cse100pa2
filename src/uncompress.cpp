@@ -149,9 +149,7 @@ void uncompressBitwise(const string & infile, const string & outfile) {
         ofs << (byte)tree.decode(bis);
         i++;
     }
-    
-    cout << i << endl;
-    cout << total << endl;
+
     ifs.close();
     ofs.close();
     cerr << "TODO: uncompress '" << infile << "' -> '"
