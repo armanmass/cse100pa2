@@ -83,8 +83,8 @@ void compressBitwise(const string & infile, const string & outfile) {
     byte c;
 
     if(ifs.peek() == -1){
-        for(size_t i = 0; i < freqs.size(); i++)
-            ofs << 0 << endl;
+        for(size_t i = 0; i < 1024; i++)
+            ofs << (unsigned char)0;
         ifs.close();
         ofs.close();
         return;
@@ -97,8 +97,13 @@ void compressBitwise(const string & infile, const string & outfile) {
 
     tree.build(freqs);
     //tree.printTree();
-    for(size_t i = 0; i < freqs.size(); i++)
-        ofs << freqs[i] << endl;
+    for(size_t i = 0; i < freqs.size(); i++){
+        int convert = freqs[i];
+        for(int j = 0; j < 4; j++){
+            unsigned char temp = (unsigned char)(convert >> (8*j));
+            ofs << temp;
+        }
+    }
 
     ifs.clear();
     ifs.seekg(0, ios::beg);

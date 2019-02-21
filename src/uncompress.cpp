@@ -4,6 +4,7 @@
 #include <vector>
 #include <stdint.h>
 #include <sstream>
+#include <bitset>
 
 #include "HCNode.hpp"
 #include "HCTree.hpp"
@@ -100,12 +101,25 @@ void uncompressBitwise(const string & infile, const string & outfile) {
 
     HCTree tree;
     vector<int> freqs(256, 0);
-    int count;
   
     if(ifs.peek() == -1){
         ifs.close();
         ofs.close();
         return;
+    }
+
+    unsigned int convert = 0;
+    unsigned int temp = 0;
+    for(int i = 0; i < 256; i++){
+        convert = 0;
+        for(int j = 0; j < 4; j++){
+            temp = 0;
+            temp = (unsigned int)ifs.get();
+            convert >>= 8;
+            temp <<= 24;
+            convert |= temp;
+        }
+        freqs[i] = convert;
     }
 
     int first = 0;
@@ -115,13 +129,12 @@ void uncompressBitwise(const string & infile, const string & outfile) {
 
     for(int i = 0; i < 256; i++){
         if(!first){
-            ifs >> first;
-            total += first;
+            first = freqs[i];
             num++;
         }else{
-            ifs >> next;
+            next = freqs[i];
         }       
-        total += next;
+        total += freqs[i];
     }
 
     if(first == total){
@@ -131,17 +144,9 @@ void uncompressBitwise(const string & infile, const string & outfile) {
         ofs.close();
         return;
     }
-
-    ifs.clear();
-    ifs.seekg(0, ios::beg);
-
-    for(size_t i = 0; i < freqs.size(); i++){
-        ifs >> count;
-        freqs[i] = count;
-    }
         
     tree.build(freqs);
-    ifs.get();
+
     BitInputStream bis(ifs);
     int i = 0;
     while(i < total){
